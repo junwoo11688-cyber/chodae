@@ -1,0 +1,1776 @@
+﻿<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>나랑 갇히러 갈사람</title>
+  <style>
+    @font-face {
+      font-family: "Nanum Myeongjo";
+      src: url("./fonts/NanumMyeongjo.otf") format("opentype");
+      font-weight: 400 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Pretendard";
+      src: url("./fonts/Pretendard-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Pretendard Bold";
+      src: url("./fonts/Pretendard-Bold.woff2") format("woff2");
+      font-weight: 700 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Museum Classic B";
+      src: url("./fonts/MuseumClassicB.otf") format("opentype");
+      font-weight: 700 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Museum Classic M";
+      src: url("./fonts/MuseumClassicM.otf") format("opentype");
+      font-weight: 400 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: light;
+      --bg: #f6f6f2;
+      --ink: #20201d;
+      --muted: #68665f;
+      --line: #d7d3c8;
+      --panel: #ffffff;
+      --panel-2: #efede6;
+      --red: #b43c36;
+      --teal: #1f756f;
+      --gold: #b9822f;
+      --black: #151512;
+      --focus: 0 0 0 3px rgba(31, 117, 111, .24);
+      font-family: "Nanum Myeongjo", "Malgun Gothic", "Apple SD Gothic Neo", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, rgba(32, 32, 29, .018) 1px, transparent 1px) 0 0 / 42px 42px,
+        linear-gradient(rgba(32, 32, 29, .015) 1px, transparent 1px) 0 0 / 42px 42px,
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .controls {
+      min-height: 0;
+      padding: 28px;
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .brand-kicker {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 750;
+      line-height: 1.3;
+    }
+
+    .brand small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.4;
+    }
+
+    .field-group {
+      display: grid;
+      gap: 14px;
+    }
+
+    .section-title {
+      margin: 0 0 2px;
+      font-size: .82rem;
+      letter-spacing: .08em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .entry-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .entry-card {
+      border: 1px solid #d8d1c4;
+      border-radius: 8px;
+      background: #fbfaf6;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      box-shadow: 0 1px 0 rgba(32, 32, 29, .04);
+    }
+
+    .entry-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .entry-title {
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .entry-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .entry-fields .field {
+      min-width: 0;
+      gap: 5px;
+    }
+
+    .entry-fields .field:nth-child(3) {
+      max-width: 150px;
+    }
+
+    .entry-fields label {
+      font-size: .84rem;
+    }
+
+    .entry-fields input {
+      min-height: 40px;
+      padding: 8px 10px;
+    }
+
+    .remove-entry {
+      width: 30px;
+      height: 30px;
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f7f4ed;
+      color: #70685d;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background .16s ease, color .16s ease, border-color .16s ease;
+    }
+
+    .remove-entry:hover {
+      background: #eee7dd;
+      border-color: #c9bdad;
+      color: var(--ink);
+    }
+
+    label {
+      color: #35332e;
+      font-size: .92rem;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fbfaf6;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    input:focus {
+      border-color: var(--teal);
+      box-shadow: var(--focus);
+      background: #ffffff;
+    }
+
+    .style-options {
+      display: grid;
+      gap: 9px;
+    }
+
+    .style-option {
+      position: relative;
+      min-height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfaf6;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      font-weight: 850;
+      text-align: left;
+      transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
+    }
+
+    .style-option:hover {
+      transform: translateY(-1px);
+      border-color: rgba(32, 32, 29, .4);
+    }
+
+    .style-option.is-active {
+      background: #1d1917;
+      color: #fffaf0;
+      border-color: #b98258;
+      box-shadow: inset 0 0 0 2px rgba(217, 173, 85, .38);
+    }
+
+    .style-option.is-active::after {
+      content: "";
+      width: 8px;
+      height: 14px;
+      border-right: 2px solid #fffaf0;
+      border-bottom: 2px solid #fffaf0;
+      transform: rotate(45deg);
+      margin-left: 2px;
+    }
+
+    .style-swatch {
+      width: 54px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #0f7774 0 36%, #8f2f37 36% 68%, #d3b98f 68%);
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .35);
+      flex: 0 0 auto;
+    }
+
+    .style-swatch.memory {
+      background: linear-gradient(90deg, #f8ead6 0 42%, #56321f 42% 72%, #c99a6c 72%);
+    }
+
+    .style-swatch.napolitan {
+      background: linear-gradient(90deg, #1a0503 0 24%, #7a0502 24% 66%, #7a4b24 66%);
+    }
+
+    .style-note {
+      margin-left: auto;
+      color: rgba(32, 32, 29, .54);
+      font-size: .78rem;
+      font-weight: 750;
+    }
+
+    .style-option.is-active .style-note {
+      color: rgba(255, 250, 240, .58);
+    }
+
+    .remove-entry:focus-visible,
+    .save-button:focus-visible,
+    .icon-button:focus-visible,
+    .style-option:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .actions {
+      grid-column: 1;
+      grid-row: 2;
+      display: grid;
+      gap: 10px;
+      padding: 18px 28px 28px;
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+    }
+
+    .action-status {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: .86rem;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .preview-hint {
+      color: var(--muted);
+      font-weight: 650;
+      font-size: .88rem;
+      line-height: 1.35;
+      text-align: right;
+    }
+
+    .actions {
+      border-top: 1px solid var(--line);
+    }
+
+    .save-button,
+    .icon-button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: transform .16s ease, filter .16s ease;
+    }
+
+    .save-button:hover,
+    .icon-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .save-button:active,
+    .icon-button:active {
+      transform: translateY(0);
+    }
+
+    .save-button {
+      background: var(--red);
+      color: #fffaf0;
+      font-weight: 800;
+    }
+
+    .icon-button {
+      background: #e9e5da;
+      color: var(--ink);
+      font-weight: 750;
+    }
+
+    .reset-button {
+      background: transparent;
+      border: 1px solid #e3ded3;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    svg {
+      flex: 0 0 auto;
+    }
+
+    .stage {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      min-width: 0;
+      min-height: 100vh;
+      padding: 28px;
+      display: grid;
+      place-items: center;
+    }
+
+    .preview-shell {
+      width: min(100%, 760px);
+      display: grid;
+      gap: 14px;
+    }
+
+    .preview-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .preview-size {
+      color: #34322e;
+      font-weight: 750;
+    }
+
+    .canvas-frame {
+      width: 100%;
+      max-height: calc(100vh - 100px);
+      aspect-ratio: 4 / 5;
+      border: 1px solid rgba(32, 32, 29, .22);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #171714;
+      box-shadow: 0 22px 60px rgba(38, 35, 27, .18);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .controls {
+        min-height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .stage {
+        order: 2;
+        min-height: auto;
+        padding-top: 18px;
+      }
+
+      .canvas-frame {
+        max-height: none;
+      }
+
+      .actions {
+        order: 3;
+        padding: 18px 28px 28px;
+        border-right: 0;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .controls,
+      .stage {
+        padding: 18px;
+      }
+
+      .brand {
+        align-items: flex-start;
+      }
+
+      .button-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .preview-toolbar {
+        align-items: center;
+        flex-direction: row;
+      }
+
+      .preview-hint {
+        text-align: right;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="controls" aria-label="초대장 입력">
+      <header class="brand">
+        <div class="brand-mark">
+          <div>
+            <p class="brand-kicker">방탈출 초대장 이미지 생성기</p>
+            <h1>나랑 갇히러 갈사람</h1>
+            <small>By 달물결</small>
+          </div>
+        </div>
+      </header>
+
+      <div class="field-group">
+        <p class="section-title">Invitation</p>
+        <div class="field">
+          <label for="inviteTitle">초대장 제목</label>
+          <input id="inviteTitle" maxlength="34" placeholder="초대합니다" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <p class="section-title">Rooms</p>
+        <div class="entry-list" id="entryList" aria-label="매장, 테마, 가격 목록"></div>
+        <button class="icon-button" type="button" id="addEntryButton" title="항목 추가">
+          <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+          항목 추가
+        </button>
+      </div>
+
+      <div class="field-group">
+        <p class="section-title">Style</p>
+        <div class="style-options" role="group" aria-label="초대장 스타일 선택">
+          <button class="style-option is-active" type="button" data-style="napolitan" aria-pressed="true">
+            <span class="style-swatch napolitan" aria-hidden="true"></span>
+            나폴리탄
+            <span class="style-note">red frame</span>
+          </button>
+          <button class="style-option" type="button" data-style="memory" aria-pressed="false">
+            <span class="style-swatch memory" aria-hidden="true"></span>
+            메모리컴퍼니
+            <span class="style-note">memory ticket</span>
+          </button>
+          <button class="style-option" type="button" data-style="shortline" aria-pressed="false">
+            <span class="style-swatch" aria-hidden="true"></span>
+            단편선
+            <span class="style-note">ink poster</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="stage" aria-label="초대장 미리보기">
+      <div class="preview-shell">
+        <div class="preview-toolbar">
+          <span class="preview-size">1080 × 1350 PNG</span>
+          <span class="preview-hint">입력 즉시 반영</span>
+        </div>
+        <div class="canvas-frame">
+          <canvas id="inviteCanvas" width="1080" height="1350" aria-label="생성된 방탈출 초대장"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="actions" aria-label="이미지 저장과 복사">
+      <div class="action-status" id="statusText" aria-live="polite">미리보기 준비됨</div>
+      <button class="save-button" type="button" id="saveButton">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        PNG 저장
+      </button>
+      <div class="button-row">
+        <button class="icon-button" type="button" id="copyButton" title="이미지 복사">
+          <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 8h11v11H8zM5 16V5h11" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          복사
+        </button>
+        <button class="icon-button reset-button" type="button" id="resetButton" title="기본값 복원">
+          <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 12a8 8 0 1 0 2.3-5.7M4 5v5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          초기화
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById("inviteCanvas");
+    const ctx = canvas.getContext("2d");
+    const fields = {
+      inviteTitle: document.getElementById("inviteTitle")
+    };
+    const entryList = document.getElementById("entryList");
+    const addEntryButton = document.getElementById("addEntryButton");
+    const statusText = document.getElementById("statusText");
+    const saveButton = document.getElementById("saveButton");
+    const copyButton = document.getElementById("copyButton");
+    const resetButton = document.getElementById("resetButton");
+    const styleButtons = [...document.querySelectorAll("[data-style]")];
+    const memoryBorderImage = new Image();
+    memoryBorderImage.decoding = "async";
+    memoryBorderImage.src = "./assets/memory-company-border-upscaled.png";
+    memoryBorderImage.addEventListener("load", () => renderInvite());
+    const napolitanFrameImage = new Image();
+    napolitanFrameImage.decoding = "async";
+    napolitanFrameImage.src = "./assets/napolitan-frame-upscaled.png";
+    napolitanFrameImage.addEventListener("load", () => renderInvite());
+
+    let nextEntryId = 1;
+    let activeStyle = "napolitan";
+
+    const palette = {
+      ink: "#20201d",
+      softInk: "#34302a",
+      paper: "#f3ede1",
+      paper2: "#fffaf0",
+      brass: "#c08a36",
+      red: "#b43c36",
+      teal: "#1f756f",
+      smoke: "#151512"
+    };
+
+    function titleValue() {
+      return fields.inviteTitle.value.trim();
+    }
+
+    function displayTitle() {
+      return titleValue() || fields.inviteTitle.placeholder;
+    }
+
+    function createEntry(values = {}) {
+      const entry = document.createElement("div");
+      entry.className = "entry-card";
+      entry.dataset.entryId = String(nextEntryId);
+      entry.innerHTML = `
+        <div class="entry-header">
+          <span class="entry-title">ROOM ${String(nextEntryId).padStart(2, "0")}</span>
+          <button class="remove-entry" type="button" title="항목 삭제" aria-label="항목 삭제">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="entry-fields">
+          <div class="field">
+            <label>매장</label>
+            <input data-field="store" maxlength="36" placeholder="매장명" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>테마</label>
+            <input data-field="theme" maxlength="38" placeholder="테마명" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>가격</label>
+            <input data-field="price" maxlength="28" placeholder="가격" autocomplete="off">
+          </div>
+        </div>
+      `;
+      nextEntryId += 1;
+      entryList.appendChild(entry);
+
+      entry.querySelector('[data-field="store"]').value = values.store || "";
+      entry.querySelector('[data-field="theme"]').value = values.theme || "";
+      entry.querySelector('[data-field="price"]').value = values.price || "";
+      entry.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("input", () => {
+          renderInvite();
+          markChanged();
+        });
+      });
+      entry.querySelector(".remove-entry").addEventListener("click", () => {
+        if (entryList.children.length === 1) {
+          entry.querySelectorAll("input").forEach((input) => {
+            input.value = "";
+          });
+        } else {
+          const label = entry.querySelector(".entry-title").textContent;
+          if (!window.confirm(`${label} 삭제할까요?`)) return;
+          entry.remove();
+          renumberEntries();
+        }
+        renderInvite();
+        markChanged();
+      });
+
+      renumberEntries();
+      renderInvite();
+    }
+
+    function renumberEntries() {
+      [...entryList.children].forEach((entry, index) => {
+        entry.querySelector(".entry-title").textContent = `ROOM ${String(index + 1).padStart(2, "0")}`;
+      });
+    }
+
+    function getEntries() {
+      return [...entryList.querySelectorAll(".entry-card")]
+        .map((entry) => ({
+          store: entry.querySelector('[data-field="store"]').value.trim(),
+          theme: entry.querySelector('[data-field="theme"]').value.trim(),
+          price: entry.querySelector('[data-field="price"]').value.trim()
+        }))
+        .filter((entry) => entry.store || entry.theme || entry.price);
+    }
+
+    function displayEntries() {
+      const entries = getEntries();
+      return entries.length ? entries : [{
+        store: "매장명",
+        theme: "테마명",
+        price: "가격",
+        placeholder: true
+      }];
+    }
+
+    function setStatus(message, autoReset = true) {
+      statusText.textContent = message;
+      window.clearTimeout(setStatus.timer);
+      if (autoReset) {
+        setStatus.timer = window.setTimeout(() => {
+          statusText.textContent = "미리보기 준비됨";
+        }, 1800);
+      }
+    }
+
+    function markChanged() {
+      setStatus("저장 전 변경 있음", false);
+    }
+
+    function hexToRgb(hex) {
+      const clean = hex.replace("#", "");
+      return {
+        r: parseInt(clean.slice(0, 2), 16),
+        g: parseInt(clean.slice(2, 4), 16),
+        b: parseInt(clean.slice(4, 6), 16)
+      };
+    }
+
+    function rgba(hex, alpha) {
+      const rgb = hexToRgb(hex);
+      return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+    }
+
+    function fillRoundRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function strokeRoundRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    const inviteFont = '"Nanum Myeongjo", "Batang", "Malgun Gothic", serif';
+    const memoryFont = '"Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
+    const memoryTitleFont = '"Pretendard Bold", "Pretendard", "Malgun Gothic", sans-serif';
+    const napolitanTitleFont = '"Museum Classic B", "Nanum Myeongjo", "Batang", serif';
+    const napolitanBodyFont = '"Museum Classic M", "Nanum Myeongjo", "Batang", serif';
+
+    function drawText(text, x, y, options = {}) {
+      const {
+        size = 44,
+        weight = 700,
+        color = palette.paper2,
+        align = "left",
+        baseline = "alphabetic",
+        family = inviteFont
+      } = options;
+      ctx.font = `${weight} ${size}px ${family}`;
+      ctx.fillStyle = color;
+      ctx.textAlign = align;
+      ctx.textBaseline = baseline;
+      ctx.fillText(text, x, y);
+    }
+
+    function fitSize(text, maxWidth, baseSize, minSize, weight = 800, family = inviteFont) {
+      let size = baseSize;
+      while (size > minSize) {
+        ctx.font = `${weight} ${size}px ${family}`;
+        if (ctx.measureText(text).width <= maxWidth) return size;
+        size -= 2;
+      }
+      return minSize;
+    }
+
+    function wrapLines(text, maxWidth, size, weight = 800, family = inviteFont) {
+      ctx.font = `${weight} ${size}px ${family}`;
+      const chars = [...text];
+      const lines = [];
+      let current = "";
+      chars.forEach((char) => {
+        const test = current + char;
+        if (ctx.measureText(test).width > maxWidth && current) {
+          lines.push(current);
+          current = char.trimStart();
+        } else {
+          current = test;
+        }
+      });
+      if (current) lines.push(current);
+      return lines.slice(0, 3);
+    }
+
+    function drawCenteredWrapped(text, x, y, maxWidth, baseSize, minSize, lineGap, color, family = inviteFont, weight = 800) {
+      let size = baseSize;
+      let lines = wrapLines(text, maxWidth, size, weight, family);
+      while ((lines.length > 2 || lines.some((line) => {
+        ctx.font = `${weight} ${size}px ${family}`;
+        return ctx.measureText(line).width > maxWidth;
+      })) && size > minSize) {
+        size -= 2;
+        lines = wrapLines(text, maxWidth, size, weight, family);
+      }
+      ctx.font = `${weight} ${size}px ${family}`;
+      ctx.fillStyle = color;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const total = (lines.length - 1) * (size + lineGap);
+      lines.forEach((line, index) => {
+        ctx.fillText(line, x, y - total / 2 + index * (size + lineGap));
+      });
+    }
+
+    function drawSpacedText(text, x, y, spacing, options = {}) {
+      const {
+        size = 24,
+        weight = 700,
+        color = palette.ink,
+        align = "center",
+        baseline = "middle",
+        family = memoryFont
+      } = options;
+      ctx.save();
+      ctx.font = `${weight} ${size}px ${family}`;
+      ctx.fillStyle = color;
+      ctx.textBaseline = baseline;
+      const width = [...text].reduce((sum, char, index) => sum + ctx.measureText(char).width + (index ? spacing : 0), 0);
+      let cursor = align === "center" ? x - width / 2 : align === "right" ? x - width : x;
+      [...text].forEach((char, index) => {
+        if (index) cursor += spacing;
+        ctx.fillText(char, cursor, y);
+        cursor += ctx.measureText(char).width;
+      });
+      ctx.restore();
+    }
+
+    function drawNoise(alpha = .07) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      for (let i = 0; i < 4200; i += 1) {
+        const shade = Math.floor(60 + Math.random() * 150);
+        ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+        ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1, 1);
+      }
+      ctx.restore();
+    }
+
+    const shortline = {
+      ink: "#080604",
+      paper: "#eee5d1",
+      cream: "#fff8e8",
+      teal: "#0b7775",
+      tealDark: "#054f52",
+      sage: "#8fa49d",
+      sand: "#b59d80",
+      burgundy: "#7c2631",
+      wine: "#401116",
+      coral: "#de775b",
+      gold: "#d9ad55",
+      blue: "#223754"
+    };
+
+    const memory = {
+      ink: "#56321f",
+      dark: "#2b170e",
+      paper: "#f8ead6",
+      cream: "#fff7e8",
+      tan: "#c99a6c",
+      softTan: "#e8caa2",
+      brown: "#744526",
+      shadow: "#1b0e08"
+    };
+
+    const napolitan = {
+      blood: "#780702",
+      bloodDark: "#230403",
+      ink: "#120706",
+      black: "#050303",
+      gold: "#b88448",
+      oldGold: "#6b441f",
+      paper: "#f2d3a5",
+      smoke: "#b7aaa1",
+      muted: "#b89a73"
+    };
+
+    function roughLine(x1, y1, x2, y2, color, width = 2, jitter = 1.4) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      for (let i = 1; i <= 7; i += 1) {
+        const t = i / 7;
+        const wobble = Math.sin(i * 12.31 + x1 * .01 + y2 * .01) * jitter;
+        ctx.lineTo(x1 + (x2 - x1) * t + wobble, y1 + (y2 - y1) * t - wobble * .6);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function hatchRect(x, y, w, h, step, color, alpha = 1, angle = 0, width = 2) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.clip();
+      ctx.translate(x + w / 2, y + h / 2);
+      ctx.rotate(angle);
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      const span = Math.max(w, h) * 1.6;
+      for (let line = -span; line <= span; line += step) {
+        ctx.beginPath();
+        ctx.moveTo(-span, line);
+        ctx.lineTo(span, line + Math.sin(line * .03) * 3);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawPaperGrain() {
+      ctx.save();
+      ctx.globalAlpha = .12;
+      for (let i = 0; i < 3600; i += 1) {
+        const x = (i * 73) % canvas.width;
+        const y = (i * 151) % canvas.height;
+        const shade = 80 + ((i * 37) % 90);
+        ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+        ctx.fillRect(x, y, 1, 1);
+      }
+      ctx.restore();
+    }
+
+    function drawArchField() {
+      const c = shortline;
+      const bg = ctx.createLinearGradient(0, 120, 0, 1240);
+      bg.addColorStop(0, c.teal);
+      bg.addColorStop(.58, c.sage);
+      bg.addColorStop(1, c.wine);
+
+      ctx.save();
+      ctx.fillStyle = bg;
+      fillRoundRect(84, 84, 912, 1168, 8);
+      ctx.restore();
+
+      hatchRect(104, 112, 872, 1098, 15, c.ink, .5, 0, 2);
+      hatchRect(124, 630, 832, 520, 11, c.ink, .16, -.55, 1.2);
+    }
+
+    function drawPagePanel(x, y, w, h) {
+      const c = shortline;
+      ctx.save();
+      ctx.fillStyle = c.cream;
+      ctx.strokeStyle = c.ink;
+      ctx.lineWidth = 6;
+      fillRoundRect(x, y, w, h, 8);
+      strokeRoundRect(x, y, w, h, 8);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = c.sage;
+      strokeRoundRect(x + 16, y + 16, w - 32, h - 32, 6);
+      hatchRect(x + 22, y + 22, w - 44, h - 44, 13, c.ink, .09, -.5, 1.3);
+      ctx.restore();
+    }
+
+    function drawShortlineEntries(entries) {
+      const c = shortline;
+      const x = 152;
+      const y = 604;
+      const w = 776;
+      const h = 408;
+      drawPagePanel(x, y, w, h);
+
+      ctx.save();
+      drawText("방탈출 목록", x + 42, y + 56, {
+        size: 26,
+        weight: 900,
+        color: c.wine,
+        align: "left",
+        baseline: "middle",
+        family: inviteFont
+      });
+      roughLine(x + 42, y + 84, x + w - 42, y + 76, c.ink, 2.2, 1.6);
+
+      const visible = entries.slice(0, 4);
+      const rowH = 76;
+      visible.forEach((entry, index) => {
+        const rowY = y + 132 + index * rowH;
+        const store = entry.store || "매장명";
+        const theme = entry.theme || "테마명";
+        const price = entry.price || "가격";
+        const muted = entry.placeholder ? "rgba(8,6,4,.45)" : "rgba(8,6,4,.68)";
+        const strong = entry.placeholder ? "rgba(8,6,4,.52)" : c.ink;
+
+        ctx.fillStyle = index % 2 === 0 ? rgba(c.teal, .16) : rgba(c.burgundy, .12);
+        fillRoundRect(x + 34, rowY - 34, w - 68, 62, 4);
+        ctx.fillStyle = c.burgundy;
+        ctx.fillRect(x + 48, rowY - 28, 5, 50);
+        drawText(String(index + 1).padStart(2, "0"), x + 75, rowY - 2, {
+          size: 22,
+          weight: 900,
+          color: c.burgundy,
+          align: "left",
+          baseline: "middle",
+          family: inviteFont
+        });
+        drawText(theme, x + 126, rowY - 14, {
+          size: fitSize(theme, 410, 36, 22, 900),
+          weight: 900,
+          color: strong,
+          align: "left",
+          baseline: "middle",
+          family: inviteFont
+        });
+        drawText(store, x + 128, rowY + 20, {
+          size: fitSize(store, 410, 21, 15, 750),
+          weight: 750,
+          color: muted,
+          align: "left",
+          baseline: "middle",
+          family: inviteFont
+        });
+        drawText(price, x + w - 58, rowY + 2, {
+          size: fitSize(price, 164, 28, 17, 850),
+          weight: 850,
+          color: c.ink,
+          align: "right",
+          baseline: "middle",
+          family: inviteFont
+        });
+      });
+
+      if (entries.length > visible.length) {
+        drawText(`외 ${entries.length - visible.length}개 더`, x + w / 2, y + h - 34, {
+          size: 20,
+          weight: 850,
+          color: c.wine,
+          align: "center",
+          baseline: "middle",
+          family: inviteFont
+        });
+      }
+      ctx.restore();
+    }
+
+    function drawNapolitanBackground() {
+      const c = napolitan;
+      if (napolitanFrameImage.complete && napolitanFrameImage.naturalWidth) {
+        ctx.drawImage(napolitanFrameImage, 0, 0, canvas.width, canvas.height);
+      } else {
+        const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        bg.addColorStop(0, c.black);
+        bg.addColorStop(.16, c.blood);
+        bg.addColorStop(.72, c.bloodDark);
+        bg.addColorStop(1, c.black);
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      ctx.save();
+      ctx.globalCompositeOperation = "multiply";
+      ctx.fillStyle = "rgba(12, 0, 0, .28)";
+      fillRoundRect(116, 102, 848, 1138, 4);
+      hatchRect(128, 126, 824, 1082, 8, "#050000", .18, -.32, 1);
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalAlpha = .24;
+      ctx.strokeStyle = c.black;
+      ctx.lineWidth = 4;
+      roughLine(170, 400, 910, 378, c.black, 4, 3);
+      roughLine(120, 650, 940, 702, c.black, 3.4, 4);
+      roughLine(260, 980, 860, 924, c.black, 2.4, 3);
+      ctx.restore();
+    }
+
+    function drawNapolitanTitle() {
+      const c = napolitan;
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, .72)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetY = 4;
+      drawCenteredWrapped(displayTitle(), 540, 232, 680, 64, 34, 8, c.paper, napolitanTitleFont, 900);
+      ctx.restore();
+      roughLine(300, 300, 780, 292, "rgba(242, 211, 165, .5)", 1.8, 1.5);
+    }
+
+    function drawNapolitanEntries(entries) {
+      const c = napolitan;
+      const x = 166;
+      const y = 420;
+      const w = 748;
+      const h = 474;
+      const visible = entries.slice(0, 4);
+
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, .62)";
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetY = 16;
+      ctx.fillStyle = "rgba(10, 4, 4, .72)";
+      fillRoundRect(x, y, w, h, 4);
+      ctx.shadowColor = "transparent";
+      ctx.strokeStyle = "rgba(184, 132, 72, .78)";
+      ctx.lineWidth = 4;
+      strokeRoundRect(x, y, w, h, 4);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "rgba(242, 211, 165, .24)";
+      strokeRoundRect(x + 18, y + 18, w - 36, h - 36, 2);
+      hatchRect(x + 24, y + 24, w - 48, h - 48, 10, "#f2d3a5", .05, -.45, 1);
+
+      drawSpacedText("ROOM LIST", x + w / 2, y + 60, 7, {
+        size: 23,
+        weight: 700,
+        color: c.paper,
+        family: napolitanBodyFont
+      });
+      roughLine(x + 58, y + 94, x + w - 58, y + 88, "rgba(242, 211, 165, .5)", 1.8, 1.2);
+
+      visible.forEach((entry, index) => {
+        const rowY = y + 146 + index * 70;
+        const store = entry.store || "매장명";
+        const theme = entry.theme || "테마명";
+        const price = entry.price || "가격";
+        const strong = entry.placeholder ? "rgba(242, 211, 165, .58)" : c.paper;
+        const muted = entry.placeholder ? "rgba(242, 211, 165, .38)" : "rgba(242, 211, 165, .64)";
+
+        ctx.fillStyle = index % 2 === 0 ? "rgba(120, 7, 2, .42)" : "rgba(0, 0, 0, .25)";
+        fillRoundRect(x + 40, rowY - 34, w - 80, 58, 2);
+        ctx.fillStyle = index % 2 === 0 ? c.gold : c.blood;
+        ctx.fillRect(x + 58, rowY - 27, 4, 45);
+
+        drawText(String(index + 1).padStart(2, "0"), x + 84, rowY - 2, {
+          size: 19,
+          weight: 700,
+          color: c.gold,
+          align: "left",
+          baseline: "middle",
+          family: napolitanBodyFont
+        });
+        drawText(theme, x + 134, rowY - 13, {
+          size: fitSize(theme, 390, 32, 20, 900, napolitanTitleFont),
+          weight: 900,
+          color: strong,
+          align: "left",
+          baseline: "middle",
+          family: napolitanTitleFont
+        });
+        drawText(store, x + 136, rowY + 18, {
+          size: fitSize(store, 390, 18, 13, 700, napolitanBodyFont),
+          weight: 700,
+          color: muted,
+          align: "left",
+          baseline: "middle",
+          family: napolitanBodyFont
+        });
+        drawText(price, x + w - 62, rowY + 1, {
+          size: fitSize(price, 140, 23, 15, 700, napolitanBodyFont),
+          weight: 700,
+          color: c.paper,
+          align: "right",
+          baseline: "middle",
+          family: napolitanBodyFont
+        });
+      });
+
+      if (entries.length > visible.length) {
+        drawText(`외 ${entries.length - visible.length}개 더`, x + w / 2, y + h - 34, {
+          size: 18,
+          weight: 700,
+          color: c.muted,
+          align: "center",
+          baseline: "middle",
+          family: napolitanBodyFont
+        });
+      }
+      ctx.restore();
+    }
+
+    function drawNapolitanFooter() {
+      const c = napolitan;
+      ctx.save();
+      ctx.shadowColor = "rgba(0, 0, 0, .72)";
+      ctx.shadowBlur = 8;
+      drawText("나랑 갇히러 갈사람", 540, 1128, {
+        size: 32,
+        weight: 900,
+        color: c.paper,
+        align: "center",
+        baseline: "middle",
+        family: napolitanTitleFont
+      });
+      ctx.restore();
+    }
+
+    function drawNapolitanPoster() {
+      drawNapolitanBackground();
+      drawNapolitanTitle();
+      drawNapolitanEntries(displayEntries());
+      drawNapolitanFooter();
+      drawNoise(.035);
+    }
+
+    function drawMemoryPerforations(c) {
+      ctx.save();
+      ctx.strokeStyle = c.ink;
+      ctx.lineWidth = 2;
+      for (let x = 34; x <= 1046; x += 14) {
+        ctx.beginPath();
+        ctx.moveTo(x, 24);
+        ctx.lineTo(x, 42);
+        ctx.moveTo(x, 1308);
+        ctx.lineTo(x, 1326);
+        ctx.stroke();
+      }
+      for (let y = 36; y <= 1314; y += 14) {
+        ctx.beginPath();
+        ctx.moveTo(24, y);
+        ctx.lineTo(42, y);
+        ctx.moveTo(1038, y);
+        ctx.lineTo(1056, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawNineSliceImage(image, dx, dy, dw, dh, sourceMargin, targetMargin) {
+      const iw = image.naturalWidth || image.width;
+      const ih = image.naturalHeight || image.height;
+      const sm = sourceMargin;
+      const tm = Math.min(targetMargin, dw / 2 - 1, dh / 2 - 1);
+      const centerSw = iw - sm * 2;
+      const centerSh = ih - sm * 2;
+      const centerDw = dw - tm * 2;
+      const centerDh = dh - tm * 2;
+
+      ctx.drawImage(image, 0, 0, sm, sm, dx, dy, tm, tm);
+      ctx.drawImage(image, iw - sm, 0, sm, sm, dx + dw - tm, dy, tm, tm);
+      ctx.drawImage(image, 0, ih - sm, sm, sm, dx, dy + dh - tm, tm, tm);
+      ctx.drawImage(image, iw - sm, ih - sm, sm, sm, dx + dw - tm, dy + dh - tm, tm, tm);
+
+      ctx.drawImage(image, sm, 0, centerSw, sm, dx + tm, dy, centerDw, tm);
+      ctx.drawImage(image, sm, ih - sm, centerSw, sm, dx + tm, dy + dh - tm, centerDw, tm);
+      ctx.drawImage(image, 0, sm, sm, centerSh, dx, dy + tm, tm, centerDh);
+      ctx.drawImage(image, iw - sm, sm, sm, centerSh, dx + dw - tm, dy + tm, tm, centerDh);
+      ctx.drawImage(image, sm, sm, centerSw, centerSh, dx + tm, dy + tm, centerDw, centerDh);
+    }
+
+    function drawMemoryBorder(c) {
+      ctx.fillStyle = c.paper;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (memoryBorderImage.complete && memoryBorderImage.naturalWidth) {
+        drawNineSliceImage(memoryBorderImage, 18, 18, 1044, 1314, 580, 296);
+        return;
+      }
+
+      ctx.save();
+      ctx.strokeStyle = c.ink;
+      ctx.lineWidth = 4;
+      ctx.strokeRect(18, 18, 1044, 1314);
+      ctx.lineWidth = 24;
+      ctx.strokeRect(84, 84, 912, 1182);
+      hatchRect(104, 104, 872, 1142, 13, c.ink, .12, -.28, 1.4);
+      ctx.restore();
+    }
+
+    function drawMemoryLeaf(c, x, y, angle, scale = 1) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.scale(scale, scale);
+      ctx.fillStyle = c.ink;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(18, -13, 43, -12, 60, 0);
+      ctx.bezierCurveTo(42, 12, 17, 12, 0, 0);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = c.paper;
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(9, 0);
+      ctx.lineTo(50, 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawMemoryCorner(c, x, y, sx, sy) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(sx, sy);
+      ctx.strokeStyle = c.ink;
+      ctx.lineWidth = 4;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(0, 82);
+      ctx.bezierCurveTo(32, 32, 74, 10, 134, 14);
+      ctx.bezierCurveTo(104, 40, 72, 54, 30, 58);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(12, 96);
+      ctx.bezierCurveTo(46, 88, 74, 96, 90, 124);
+      ctx.bezierCurveTo(58, 126, 30, 118, 12, 96);
+      ctx.stroke();
+      for (let i = 0; i < 4; i += 1) {
+        drawMemoryLeaf(c, 42 + i * 28, 54 - i * 9, -.58 + i * .07, .62);
+      }
+      ctx.beginPath();
+      ctx.arc(18, 72, 18, .35, Math.PI * 1.8);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(64, 98, 14, Math.PI * .2, Math.PI * 1.9);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawMemoryDeskProps(c) {
+      function tiltedPaper(x, y, w, h, angle, fill, label) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = c.shadow;
+        ctx.lineWidth = 4;
+        fillRoundRect(-w / 2, -h / 2, w, h, 5);
+        strokeRoundRect(-w / 2, -h / 2, w, h, 5);
+        if (label) {
+          drawText(label, 0, 8, {
+            size: 20,
+            weight: 700,
+            color: c.brown,
+            align: "center",
+            baseline: "middle",
+            family: memoryFont
+          });
+        }
+        ctx.restore();
+      }
+
+      tiltedPaper(308, 396, 180, 128, -.12, "#d7c5aa", "MEMO");
+      tiltedPaper(760, 392, 150, 132, .18, "#1f130d", "");
+      tiltedPaper(330, 700, 190, 122, .16, "#ead7b8", "FILE");
+      tiltedPaper(720, 716, 170, 136, -.2, "#d9c0a1", "KEY");
+
+      ctx.save();
+      ctx.strokeStyle = c.shadow;
+      ctx.fillStyle = "#f3e3c9";
+      ctx.lineWidth = 5;
+      ctx.translate(540, 334);
+      ctx.beginPath();
+      ctx.arc(0, 0, 54, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, 30, 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < 10; i += 1) {
+        const a = i * Math.PI * 2 / 10;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a) * 24, Math.sin(a) * 24, 4, 0, Math.PI * 2);
+        ctx.fillStyle = c.shadow;
+        ctx.fill();
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = c.shadow;
+      ctx.lineWidth = 9;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(760, 586);
+      ctx.lineTo(850, 560);
+      ctx.stroke();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = c.paper;
+      ctx.beginPath();
+      ctx.moveTo(770, 583);
+      ctx.lineTo(836, 564);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawMemoryCircleScene(c) {
+      const cx = 540;
+      const cy = 540;
+      const radius = 364;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.clip();
+      const table = ctx.createLinearGradient(220, 180, 860, 890);
+      table.addColorStop(0, "#20120b");
+      table.addColorStop(.52, "#5c321d");
+      table.addColorStop(1, "#160b07");
+      ctx.fillStyle = table;
+      ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+      hatchRect(cx - radius, cy - radius, radius * 2, radius * 2, 18, "#0c0604", .35, -.35, 2);
+      ctx.globalAlpha = .35;
+      for (let y = cy - radius + 42; y < cy + radius; y += 72) {
+        roughLine(cx - radius + 20, y, cx + radius - 20, y + 20, "#d2a875", 2, 1.2);
+      }
+      ctx.globalAlpha = 1;
+      drawMemoryDeskProps(c);
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = c.cream;
+      ctx.lineWidth = 16;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius + 4, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = c.ink;
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius + 14, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = c.tan;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius - 12, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawMemoryEntries(entries) {
+      const c = memory;
+      const x = 206;
+      const y = 408;
+      const w = 668;
+      const h = 340;
+
+      ctx.save();
+      ctx.shadowColor = "rgba(18, 8, 3, .45)";
+      ctx.shadowBlur = 18;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = c.cream;
+      fillRoundRect(x, y, w, h, 8);
+      ctx.shadowColor = "transparent";
+      ctx.strokeStyle = c.ink;
+      ctx.lineWidth = 6;
+      strokeRoundRect(x, y, w, h, 8);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = c.softTan;
+      strokeRoundRect(x + 15, y + 15, w - 30, h - 30, 5);
+      hatchRect(x + 20, y + 20, w - 40, h - 40, 14, c.ink, .08, -.42, 1.1);
+
+      drawSpacedText("ROOM LIST", x + w / 2, y + 48, 5, {
+        size: 24,
+        weight: 800,
+        color: c.ink,
+        family: memoryFont
+      });
+      roughLine(x + 52, y + 78, x + w - 52, y + 78, c.ink, 2.4, .6);
+
+      entries.slice(0, 4).forEach((entry, index) => {
+        const rowY = y + 122 + index * 54;
+        const store = entry.store || "매장명";
+        const theme = entry.theme || "테마명";
+        const price = entry.price || "가격";
+        const muted = entry.placeholder ? "rgba(86, 50, 31, .48)" : "rgba(86, 50, 31, .68)";
+        const strong = entry.placeholder ? "rgba(86, 50, 31, .54)" : c.dark;
+
+        ctx.fillStyle = index % 2 === 0 ? "rgba(116, 69, 38, .1)" : "rgba(201, 154, 108, .16)";
+        fillRoundRect(x + 36, rowY - 25, w - 72, 46, 4);
+        ctx.fillStyle = c.ink;
+        ctx.fillRect(x + 50, rowY - 21, 4, 38);
+        drawText(String(index + 1).padStart(2, "0"), x + 74, rowY - 2, {
+          size: 18,
+          weight: 800,
+          color: c.ink,
+          align: "left",
+          baseline: "middle",
+          family: memoryFont
+        });
+        drawText(theme, x + 120, rowY - 9, {
+          size: fitSize(theme, 340, 27, 18, 800, memoryFont),
+          weight: 800,
+          color: strong,
+          align: "left",
+          baseline: "middle",
+          family: memoryFont
+        });
+        drawText(store, x + 122, rowY + 14, {
+          size: fitSize(store, 330, 16, 12, 700, memoryFont),
+          weight: 700,
+          color: muted,
+          align: "left",
+          baseline: "middle",
+          family: memoryFont
+        });
+        drawText(price, x + w - 55, rowY + 2, {
+          size: fitSize(price, 132, 21, 14, 800, memoryFont),
+          weight: 800,
+          color: c.ink,
+          align: "right",
+          baseline: "middle",
+          family: memoryFont
+        });
+      });
+
+      if (entries.length > 4) {
+        drawText(`외 ${entries.length - 4}개 더`, x + w / 2, y + h - 25, {
+          size: 17,
+          weight: 800,
+          color: c.ink,
+          align: "center",
+          baseline: "middle",
+          family: memoryFont
+        });
+      }
+      ctx.restore();
+    }
+
+    function drawMemoryRibbon(text) {
+      const c = memory;
+      ctx.save();
+      ctx.strokeStyle = c.ink;
+      ctx.fillStyle = c.cream;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.lineWidth = 6;
+
+      ctx.beginPath();
+      ctx.moveTo(234, 818);
+      ctx.quadraticCurveTo(540, 770, 846, 818);
+      ctx.lineTo(814, 912);
+      ctx.quadraticCurveTo(540, 960, 266, 912);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(234, 818);
+      ctx.lineTo(158, 848);
+      ctx.lineTo(224, 878);
+      ctx.lineTo(266, 912);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(846, 818);
+      ctx.lineTo(922, 848);
+      ctx.lineTo(856, 878);
+      ctx.lineTo(814, 912);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      hatchRect(174, 824, 732, 104, 11, c.ink, .09, -.5, 1.1);
+      drawCenteredWrapped(text, 540, 870, 520, 54, 26, 4, c.ink, memoryFont, 900);
+      ctx.restore();
+    }
+
+    function drawMemoryPaperGrain() {
+      ctx.save();
+      ctx.globalAlpha = .13;
+      for (let i = 0; i < 3000; i += 1) {
+        const x = (i * 79) % canvas.width;
+        const y = (i * 137) % canvas.height;
+        ctx.fillStyle = i % 2 === 0 ? "#6f4429" : "#fff7e8";
+        ctx.fillRect(x, y, 1, 1);
+      }
+      ctx.restore();
+    }
+
+    function drawMemoryTitle() {
+      const c = memory;
+      drawCenteredWrapped(displayTitle(), 540, 284, 650, 58, 30, 6, c.ink, memoryTitleFont, 900);
+    }
+
+    function drawMemoryFooter() {
+      const c = memory;
+      drawText("나랑 갇히러 갈사람", 540, 1130, {
+        size: 34,
+        weight: 900,
+        color: c.ink,
+        align: "center",
+        baseline: "middle",
+        family: memoryTitleFont
+      });
+    }
+
+    function drawMemoryPoster() {
+      const c = memory;
+      drawMemoryBorder(c);
+      drawMemoryTitle();
+      drawMemoryEntries(displayEntries());
+      drawMemoryFooter();
+      drawMemoryPaperGrain();
+    }
+
+    function drawShortlinePoster() {
+      const c = shortline;
+      const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bg.addColorStop(0, c.ink);
+      bg.addColorStop(.52, "#120c0b");
+      bg.addColorStop(1, "#0b0808");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawArchField();
+
+      ctx.save();
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = c.ink;
+      ctx.lineWidth = 12;
+      strokeRoundRect(52, 52, 976, 1246, 8);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = c.sand;
+      strokeRoundRect(70, 70, 940, 1210, 8);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(8, 6, 4, .72)";
+      strokeRoundRect(88, 88, 904, 1174, 6);
+      ctx.restore();
+
+      drawCenteredWrapped(displayTitle(), 540, 164, 780, 76, 46, 8, c.cream);
+
+      drawShortlineEntries(displayEntries());
+
+      drawText("나랑 갇히러 갈사람", 540, 1192, {
+        size: 40,
+        weight: 900,
+        color: c.paper,
+        align: "center",
+        baseline: "middle",
+        family: inviteFont
+      });
+
+      drawPaperGrain();
+    }
+
+    function renderInvite() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (activeStyle === "napolitan") {
+        drawNapolitanPoster();
+      } else if (activeStyle === "memory") {
+        drawMemoryPoster();
+      } else {
+        drawShortlinePoster();
+      }
+    }
+
+    function safeFileName(text) {
+      return text
+        .trim()
+        .replace(/[\\/:*?"<>|]/g, "")
+        .replace(/\s+/g, "-")
+        .slice(0, 28) || "escape-invitation";
+    }
+
+    function saveCanvas() {
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = `${safeFileName(titleValue() || "나랑 갇히러 갈사람")}.png`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        setStatus("PNG 저장 완료", false);
+      }, "image/png");
+    }
+
+    async function copyCanvas() {
+      if (!navigator.clipboard || !window.ClipboardItem) {
+        setStatus("복사 미지원 브라우저");
+        return;
+      }
+      canvas.toBlob(async (blob) => {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          setStatus("이미지 복사 완료");
+        } catch (error) {
+          setStatus("복사 권한 확인 필요");
+        }
+      }, "image/png");
+    }
+
+    Object.values(fields).forEach((field) => {
+      field.addEventListener("input", () => {
+        renderInvite();
+        markChanged();
+      });
+    });
+
+    styleButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activeStyle = button.dataset.style;
+        styleButtons.forEach((item) => {
+          const isActive = item === button;
+          item.classList.toggle("is-active", isActive);
+          item.setAttribute("aria-pressed", String(isActive));
+        });
+        renderInvite();
+        markChanged();
+      });
+    });
+
+    addEntryButton.addEventListener("click", () => {
+      createEntry();
+      markChanged();
+    });
+    saveButton.addEventListener("click", saveCanvas);
+    copyButton.addEventListener("click", copyCanvas);
+    resetButton.addEventListener("click", () => {
+      if (!window.confirm("입력한 내용을 초기화할까요?")) return;
+      fields.inviteTitle.value = "";
+      entryList.innerHTML = "";
+      nextEntryId = 1;
+      createEntry();
+      renderInvite();
+      markChanged();
+    });
+
+    createEntry();
+    renderInvite();
+    if (document.fonts) {
+      document.fonts.ready.then(renderInvite);
+    }
+  </script>
+</body>
+</html>
