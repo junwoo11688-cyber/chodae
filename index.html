@@ -45,6 +45,22 @@
       font-display: swap;
     }
 
+    @font-face {
+      font-family: "Griun Gyuwon";
+      src: url("./fonts/Griun_Gyuwon-Rg.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Cafe24 Ohsquare Air";
+      src: url("./fonts/Cafe24OhsquareAir-v2.0.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       color-scheme: light;
       --bg: #f6f6f2;
@@ -317,6 +333,19 @@
       background: linear-gradient(90deg, #1a0503 0 24%, #7a0502 24% 66%, #7a4b24 66%);
     }
 
+    .style-swatch.oddbar {
+      background:
+        linear-gradient(135deg, transparent 0 44%, #db3dff 45% 49%, transparent 50%),
+        linear-gradient(30deg, transparent 0 52%, #31f05b 53% 58%, transparent 59%),
+        linear-gradient(90deg, #020202 0 30%, #ffe538 30% 36%, #111 36% 64%, #35dff0 64% 70%, #050505 70%);
+    }
+
+    .style-swatch.allbox {
+      background:
+        linear-gradient(0deg, transparent 0 44%, rgba(11, 26, 34, .75) 45% 55%, transparent 56%),
+        linear-gradient(90deg, #075f78 0 42%, #d5b33d 42% 58%, #1a2529 58% 78%, #0a6f8f 78%);
+    }
+
     .style-note {
       margin-left: auto;
       color: rgba(32, 32, 29, .54);
@@ -429,7 +458,7 @@
     }
 
     .preview-shell {
-      width: min(100%, 760px);
+      width: min(100%, clamp(320px, calc(80vh - 88px), 860px));
       display: grid;
       gap: 14px;
     }
@@ -450,7 +479,6 @@
 
     .canvas-frame {
       width: 100%;
-      max-height: calc(100vh - 100px);
       aspect-ratio: 4 / 5;
       border: 1px solid rgba(32, 32, 29, .22);
       border-radius: 8px;
@@ -481,6 +509,10 @@
         order: 2;
         min-height: auto;
         padding-top: 18px;
+      }
+
+      .preview-shell {
+        width: min(100%, 760px);
       }
 
       .canvas-frame {
@@ -569,6 +601,16 @@
             단편선
             <span class="style-note">ink poster</span>
           </button>
+          <button class="style-option" type="button" data-style="oddbar" aria-pressed="false">
+            <span class="style-swatch oddbar" aria-hidden="true"></span>
+            오드바
+            <span class="style-note">neon bar</span>
+          </button>
+          <button class="style-option" type="button" data-style="allbox" aria-pressed="false">
+            <span class="style-swatch allbox" aria-hidden="true"></span>
+            올더박스파라다이스
+            <span class="style-note">blue wall</span>
+          </button>
         </div>
       </div>
 
@@ -635,6 +677,11 @@
 
     let nextEntryId = 1;
     let activeStyle = "napolitan";
+    let oddbarFontLoaded = false;
+    let oddbarFontLoading = false;
+    let allboxFontLoaded = false;
+    let allboxFontLoading = false;
+    const roomDisplayLimit = 10;
 
     const palette = {
       ink: "#20201d",
@@ -795,6 +842,10 @@
     const memoryTitleFont = '"Pretendard Bold", "Pretendard", "Malgun Gothic", sans-serif';
     const napolitanTitleFont = '"Museum Classic B", "Nanum Myeongjo", "Batang", serif';
     const napolitanBodyFont = '"Museum Classic M", "Nanum Myeongjo", "Batang", serif';
+    const oddbarFont = '"Griun Gyuwon", "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
+    const oddbarFontLoadSpec = '400 72px "Griun Gyuwon"';
+    const allboxFont = '"Cafe24 Ohsquare Air", "Pretendard Bold", "Pretendard", "Malgun Gothic", sans-serif';
+    const allboxFontLoadSpec = '400 72px "Cafe24 Ohsquare Air"';
 
     function drawText(text, x, y, options = {}) {
       const {
@@ -932,6 +983,37 @@
       muted: "#b89a73"
     };
 
+    const oddbar = {
+      black: "#020202",
+      softBlack: "#070b0b",
+      white: "#f2f4ee",
+      dimWhite: "#cfcfc8",
+      cyan: "#26e6e2",
+      green: "#43f35c",
+      lime: "#e5ec38",
+      amber: "#d58a16",
+      purple: "#7b62ff",
+      magenta: "#df39ff",
+      pink: "#ff4ee6",
+      red: "#ff3040"
+    };
+
+    const allbox = {
+      blue: "#045f86",
+      blueDeep: "#02283e",
+      blueDark: "#011d2d",
+      blueLight: "#056f94",
+      yellow: "#d8bb3e",
+      yellowDark: "#9a7821",
+      cream: "#ece8d6",
+      white: "#f2f0e6",
+      charcoal: "#1a2428",
+      metal: "#3a4448",
+      metalDark: "#12191c",
+      rust: "#8a4a23",
+      black: "#090d0f"
+    };
+
     function roughLine(x1, y1, x2, y2, color, width = 2, jitter = 1.4) {
       ctx.save();
       ctx.strokeStyle = color;
@@ -1016,9 +1098,9 @@
     function drawShortlineEntries(entries) {
       const c = shortline;
       const x = 152;
-      const y = 604;
+      const y = 422;
       const w = 776;
-      const h = 408;
+      const h = 664;
       drawPagePanel(x, y, w, h);
 
       ctx.save();
@@ -1032,10 +1114,10 @@
       });
       roughLine(x + 42, y + 84, x + w - 42, y + 76, c.ink, 2.2, 1.6);
 
-      const visible = entries.slice(0, 4);
-      const rowH = 76;
+      const visible = entries.slice(0, roomDisplayLimit);
+      const rowH = 50;
       visible.forEach((entry, index) => {
-        const rowY = y + 132 + index * rowH;
+        const rowY = y + 114 + index * rowH;
         const store = entry.store || "매장명";
         const theme = entry.theme || "테마명";
         const price = entry.price || "가격";
@@ -1043,11 +1125,11 @@
         const strong = entry.placeholder ? "rgba(8,6,4,.52)" : c.ink;
 
         ctx.fillStyle = index % 2 === 0 ? rgba(c.teal, .16) : rgba(c.burgundy, .12);
-        fillRoundRect(x + 34, rowY - 34, w - 68, 62, 4);
+        fillRoundRect(x + 34, rowY - 22, w - 68, 42, 4);
         ctx.fillStyle = c.burgundy;
-        ctx.fillRect(x + 48, rowY - 28, 5, 50);
+        ctx.fillRect(x + 48, rowY - 18, 5, 34);
         drawText(String(index + 1).padStart(2, "0"), x + 75, rowY - 2, {
-          size: 22,
+          size: 17,
           weight: 900,
           color: c.burgundy,
           align: "left",
@@ -1055,7 +1137,7 @@
           family: inviteFont
         });
         drawText(theme, x + 126, rowY - 14, {
-          size: fitSize(theme, 410, 36, 22, 900),
+          size: fitSize(theme, 410, 25, 16, 900),
           weight: 900,
           color: strong,
           align: "left",
@@ -1063,7 +1145,7 @@
           family: inviteFont
         });
         drawText(store, x + 128, rowY + 20, {
-          size: fitSize(store, 410, 21, 15, 750),
+          size: fitSize(store, 410, 15, 11, 750),
           weight: 750,
           color: muted,
           align: "left",
@@ -1071,7 +1153,7 @@
           family: inviteFont
         });
         drawText(price, x + w - 58, rowY + 2, {
-          size: fitSize(price, 164, 28, 17, 850),
+          size: fitSize(price, 164, 19, 12, 850),
           weight: 850,
           color: c.ink,
           align: "right",
@@ -1138,10 +1220,10 @@
     function drawNapolitanEntries(entries) {
       const c = napolitan;
       const x = 166;
-      const y = 420;
+      const y = 354;
       const w = 748;
-      const h = 474;
-      const visible = entries.slice(0, 4);
+      const h = 666;
+      const visible = entries.slice(0, roomDisplayLimit);
 
       ctx.save();
       ctx.shadowColor = "rgba(0, 0, 0, .62)";
@@ -1167,7 +1249,7 @@
       roughLine(x + 58, y + 94, x + w - 58, y + 88, "rgba(242, 211, 165, .5)", 1.8, 1.2);
 
       visible.forEach((entry, index) => {
-        const rowY = y + 146 + index * 70;
+        const rowY = y + 118 + index * 50;
         const store = entry.store || "매장명";
         const theme = entry.theme || "테마명";
         const price = entry.price || "가격";
@@ -1175,12 +1257,12 @@
         const muted = entry.placeholder ? "rgba(242, 211, 165, .38)" : "rgba(242, 211, 165, .64)";
 
         ctx.fillStyle = index % 2 === 0 ? "rgba(120, 7, 2, .42)" : "rgba(0, 0, 0, .25)";
-        fillRoundRect(x + 40, rowY - 34, w - 80, 58, 2);
+        fillRoundRect(x + 40, rowY - 23, w - 80, 42, 2);
         ctx.fillStyle = index % 2 === 0 ? c.gold : c.blood;
-        ctx.fillRect(x + 58, rowY - 27, 4, 45);
+        ctx.fillRect(x + 58, rowY - 18, 4, 33);
 
         drawText(String(index + 1).padStart(2, "0"), x + 84, rowY - 2, {
-          size: 19,
+          size: 15,
           weight: 700,
           color: c.gold,
           align: "left",
@@ -1188,7 +1270,7 @@
           family: napolitanBodyFont
         });
         drawText(theme, x + 134, rowY - 13, {
-          size: fitSize(theme, 390, 32, 20, 900, napolitanTitleFont),
+          size: fitSize(theme, 390, 24, 15, 900, napolitanTitleFont),
           weight: 900,
           color: strong,
           align: "left",
@@ -1196,7 +1278,7 @@
           family: napolitanTitleFont
         });
         drawText(store, x + 136, rowY + 18, {
-          size: fitSize(store, 390, 18, 13, 700, napolitanBodyFont),
+          size: fitSize(store, 390, 14, 10, 700, napolitanBodyFont),
           weight: 700,
           color: muted,
           align: "left",
@@ -1204,7 +1286,7 @@
           family: napolitanBodyFont
         });
         drawText(price, x + w - 62, rowY + 1, {
-          size: fitSize(price, 140, 23, 15, 700, napolitanBodyFont),
+          size: fitSize(price, 140, 17, 11, 700, napolitanBodyFont),
           weight: 700,
           color: c.paper,
           align: "right",
@@ -1476,10 +1558,11 @@
 
     function drawMemoryEntries(entries) {
       const c = memory;
-      const x = 206;
-      const y = 408;
-      const w = 668;
-      const h = 340;
+      const x = 176;
+      const y = 366;
+      const w = 728;
+      const h = 650;
+      const visible = entries.slice(0, roomDisplayLimit);
 
       ctx.save();
       ctx.shadowColor = "rgba(18, 8, 3, .45)";
@@ -1504,8 +1587,8 @@
       });
       roughLine(x + 52, y + 78, x + w - 52, y + 78, c.ink, 2.4, .6);
 
-      entries.slice(0, 4).forEach((entry, index) => {
-        const rowY = y + 122 + index * 54;
+      visible.forEach((entry, index) => {
+        const rowY = y + 112 + index * 50;
         const store = entry.store || "매장명";
         const theme = entry.theme || "테마명";
         const price = entry.price || "가격";
@@ -1513,11 +1596,11 @@
         const strong = entry.placeholder ? "rgba(86, 50, 31, .54)" : c.dark;
 
         ctx.fillStyle = index % 2 === 0 ? "rgba(116, 69, 38, .1)" : "rgba(201, 154, 108, .16)";
-        fillRoundRect(x + 36, rowY - 25, w - 72, 46, 4);
+        fillRoundRect(x + 36, rowY - 22, w - 72, 42, 4);
         ctx.fillStyle = c.ink;
-        ctx.fillRect(x + 50, rowY - 21, 4, 38);
+        ctx.fillRect(x + 50, rowY - 18, 4, 34);
         drawText(String(index + 1).padStart(2, "0"), x + 74, rowY - 2, {
-          size: 18,
+          size: 15,
           weight: 800,
           color: c.ink,
           align: "left",
@@ -1525,7 +1608,7 @@
           family: memoryFont
         });
         drawText(theme, x + 120, rowY - 9, {
-          size: fitSize(theme, 340, 27, 18, 800, memoryFont),
+          size: fitSize(theme, 390, 24, 15, 800, memoryFont),
           weight: 800,
           color: strong,
           align: "left",
@@ -1533,7 +1616,7 @@
           family: memoryFont
         });
         drawText(store, x + 122, rowY + 14, {
-          size: fitSize(store, 330, 16, 12, 700, memoryFont),
+          size: fitSize(store, 390, 14, 10, 700, memoryFont),
           weight: 700,
           color: muted,
           align: "left",
@@ -1541,7 +1624,7 @@
           family: memoryFont
         });
         drawText(price, x + w - 55, rowY + 2, {
-          size: fitSize(price, 132, 21, 14, 800, memoryFont),
+          size: fitSize(price, 132, 17, 11, 800, memoryFont),
           weight: 800,
           color: c.ink,
           align: "right",
@@ -1550,8 +1633,8 @@
         });
       });
 
-      if (entries.length > 4) {
-        drawText(`외 ${entries.length - 4}개 더`, x + w / 2, y + h - 25, {
+      if (entries.length > visible.length) {
+        drawText(`외 ${entries.length - visible.length}개 더`, x + w / 2, y + h - 25, {
           size: 17,
           weight: 800,
           color: c.ink,
@@ -1682,12 +1765,527 @@
       drawPaperGrain();
     }
 
+    function neonRoughLine(x1, y1, x2, y2, color, width = 5, jitter = 2.4, glow = 18) {
+      const c = oddbar;
+      ctx.save();
+      ctx.globalAlpha = .9;
+      roughLine(x1, y1, x2, y2, color, width, jitter);
+      ctx.globalAlpha = .34;
+      roughLine(x1 + 2, y1 + 2, x2 + 2, y2 + 2, color, Math.max(1.5, width * .55), jitter * .9);
+      ctx.globalAlpha = .55;
+      roughLine(x1 - 1, y1 - 1, x2 - 1, y2 - 1, rgba(c.white, .72), Math.max(1.2, width * .28), jitter * .55);
+      ctx.restore();
+    }
+
+    function neonRect(x, y, w, h, color, width = 5, jitter = 2.4) {
+      neonRoughLine(x, y, x + w, y + 3, color, width, jitter);
+      neonRoughLine(x + w, y, x + w - 4, y + h, color, width, jitter);
+      neonRoughLine(x + w, y + h, x, y + h - 4, color, width, jitter);
+      neonRoughLine(x, y + h, x + 3, y, color, width, jitter);
+    }
+
+    function strokeNeonPath(color, width, glow, drawPath) {
+      const c = oddbar;
+      ctx.save();
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.globalAlpha = .92;
+      ctx.beginPath();
+      drawPath();
+      ctx.stroke();
+      ctx.globalAlpha = .34;
+      ctx.lineWidth = Math.max(1.6, width * .62);
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      drawPath();
+      ctx.stroke();
+      ctx.globalAlpha = .55;
+      ctx.lineWidth = Math.max(1.2, width * .34);
+      ctx.strokeStyle = rgba(c.white, .68);
+      ctx.beginPath();
+      drawPath();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawOddbarText(text, x, y, options = {}) {
+      const {
+        size = 48,
+        minSize = 28,
+        weight = 400,
+        color = oddbar.white,
+        align = "center",
+        baseline = "middle",
+        maxWidth = null
+      } = options;
+      const fittedSize = maxWidth ? fitSize(text, maxWidth, size, minSize, weight, oddbarFont) : size;
+      ctx.save();
+      ctx.font = `${weight} ${fittedSize}px ${oddbarFont}`;
+      ctx.textAlign = align;
+      ctx.textBaseline = baseline;
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 1;
+      ctx.fillText(text, x, y);
+      ctx.globalAlpha = .5;
+      ctx.fillStyle = rgba(oddbar.white, .74);
+      ctx.fillText(text, x - 1, y - 1);
+      ctx.restore();
+    }
+
+    function drawOddbarWrappedText(text, x, y, maxWidth, baseSize, minSize, lineGap, color) {
+      let size = baseSize;
+      let lines = wrapLines(text, maxWidth, size, 400, oddbarFont);
+      while ((lines.length > 2 || lines.some((line) => {
+        ctx.font = `400 ${size}px ${oddbarFont}`;
+        return ctx.measureText(line).width > maxWidth;
+      })) && size > minSize) {
+        size -= 2;
+        lines = wrapLines(text, maxWidth, size, 400, oddbarFont);
+      }
+      const total = (lines.length - 1) * (size + lineGap);
+      lines.forEach((line, index) => {
+        drawOddbarText(line, x, y - total / 2 + index * (size + lineGap), {
+          size,
+          minSize,
+          weight: 400,
+          color,
+          maxWidth
+        });
+      });
+    }
+
+    function drawOddbarLamp(x, y, scale = 1) {
+      const c = oddbar;
+      neonRoughLine(x, -24, x + 4 * scale, y, c.dimWhite, 3.4 * scale, 1.4, 14);
+      strokeNeonPath(c.white, 4.6 * scale, 16, () => {
+        ctx.moveTo(x + 1 * scale, y);
+        ctx.quadraticCurveTo(x - 26 * scale, y + 48 * scale, x - 12 * scale, y + 88 * scale);
+        ctx.quadraticCurveTo(x + 6 * scale, y + 108 * scale, x + 28 * scale, y + 87 * scale);
+        ctx.quadraticCurveTo(x + 26 * scale, y + 42 * scale, x + 1 * scale, y);
+      });
+      strokeNeonPath(c.white, 3.8 * scale, 13, () => {
+        ctx.ellipse(x + 8 * scale, y + 88 * scale, 27 * scale, 11 * scale, .12, 0, Math.PI * 2);
+      });
+    }
+
+    function drawOddbarBackground() {
+      const c = oddbar;
+      const bg = ctx.createRadialGradient(540, 640, 30, 540, 640, 900);
+      bg.addColorStop(0, "#071010");
+      bg.addColorStop(.52, "#020303");
+      bg.addColorStop(1, c.black);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.globalAlpha = .22;
+      for (let y = 150; y <= 1250; y += 58) {
+        roughLine(20, y, 1060, y + Math.sin(y * .02) * 12, "#123231", 2, 2.2);
+      }
+      ctx.restore();
+
+      neonRoughLine(-40, 198, 272, -42, c.purple, 5, 2.2, 18);
+      neonRoughLine(64, 456, 1028, 82, c.dimWhite, 4, 2.8, 14);
+      neonRoughLine(104, 482, 1030, 304, c.dimWhite, 3.5, 2.6, 12);
+      neonRoughLine(164, 464, 864, 162, c.green, 5, 3, 20);
+      neonRoughLine(710, 328, 1038, 230, c.green, 4.2, 2.2, 18);
+      neonRoughLine(336, 598, 1064, 438, c.lime, 4.5, 2.6, 18);
+      neonRoughLine(88, 288, 460, -28, c.purple, 3.4, 2.4, 14);
+
+      drawOddbarLamp(430, 168, .9);
+      drawOddbarLamp(546, 178, .92);
+      drawOddbarLamp(734, 236, .88);
+
+      neonRect(88, 522, 170, 256, c.purple, 6, 2.4);
+      neonRect(112, 548, 122, 196, c.cyan, 5, 2.5);
+      neonRect(137, 584, 74, 122, c.green, 4, 2.3);
+      neonRect(160, 622, 28, 60, c.lime, 6, 1.8);
+
+      neonRect(332, 586, 166, 304, c.lime, 4, 2.3);
+      neonRoughLine(332, 890, 130, 910, c.amber, 4, 2.2, 14);
+      neonRoughLine(498, 890, 1066, 870, c.amber, 4, 2.2, 14);
+
+      drawOddbarWrappedText(displayTitle(), 700, 414, 560, 88, 46, 6, c.magenta);
+      neonRoughLine(616, 492, 970, 460, c.magenta, 8, 3.4, 24);
+      neonRoughLine(622, 522, 986, 486, c.magenta, 6, 3.2, 20);
+
+      strokeNeonPath(c.red, 5, 18, () => {
+        ctx.moveTo(938, 356);
+        ctx.bezierCurveTo(904, 316, 848, 342, 862, 398);
+        ctx.bezierCurveTo(878, 462, 952, 458, 974, 406);
+        ctx.bezierCurveTo(1002, 344, 956, 322, 938, 356);
+      });
+      neonRoughLine(902, 328, 927, 306, c.green, 5, 2, 16);
+      neonRoughLine(936, 372, 966, 346, c.lime, 9, 2, 18);
+
+      neonRoughLine(-50, 862, 540, 1082, c.amber, 5, 2.8, 18);
+      neonRoughLine(1130, 856, 540, 1082, c.amber, 5, 2.8, 18);
+      neonRoughLine(-40, 932, 540, 1148, c.lime, 3.5, 2.4, 12);
+      neonRoughLine(1122, 936, 540, 1148, c.amber, 4, 2.4, 14);
+      neonRoughLine(540, 1082, 540, 1340, c.amber, 4, 2.4, 16);
+
+    }
+
+    function drawOddbarEntries(entries) {
+      const c = oddbar;
+      const x = 104;
+      const y = 516;
+      const w = 872;
+      const h = 618;
+      ctx.save();
+      ctx.fillStyle = "rgba(0, 0, 0, .78)";
+      fillRoundRect(x, y, w, h, 14);
+      ctx.strokeStyle = rgba(c.cyan, .78);
+      ctx.lineWidth = 3;
+      strokeRoundRect(x, y, w, h, 14);
+      ctx.strokeStyle = rgba(c.magenta, .7);
+      ctx.lineWidth = 2;
+      strokeRoundRect(x + 12, y + 12, w - 24, h - 24, 10);
+      hatchRect(x + 18, y + 18, w - 36, h - 36, 18, c.cyan, .07, -.45, 1.2);
+      ctx.restore();
+
+      drawOddbarText("ROOM LIST", x + w / 2, y + 54, {
+        size: 34,
+        minSize: 24,
+        color: c.cyan,
+        maxWidth: 320
+      });
+      neonRoughLine(x + 74, y + 86, x + w - 74, y + 78, c.lime, 3, 1.8, 12);
+
+      const visible = entries.slice(0, roomDisplayLimit);
+      const rowH = 46;
+      visible.forEach((entry, index) => {
+        const rowY = y + 106 + index * rowH;
+        const theme = entry.theme || "테마명";
+        const store = entry.store || "매장명";
+        const price = entry.price || "가격";
+        ctx.save();
+        ctx.globalAlpha = entry.placeholder ? .62 : 1;
+        ctx.fillStyle = index % 2 ? "rgba(15, 255, 170, .055)" : "rgba(223, 57, 255, .075)";
+        fillRoundRect(x + 44, rowY - 19, w - 88, 36, 7);
+        ctx.restore();
+        neonRoughLine(x + 58, rowY + 22, x + w - 60, rowY + 17, index % 2 ? c.green : c.magenta, 1.4, 1.2, 7);
+
+        drawOddbarText(String(index + 1).padStart(2, "0"), x + 84, rowY, {
+          size: 19,
+          minSize: 14,
+          color: c.lime,
+          align: "center",
+          maxWidth: 44
+        });
+        drawOddbarText(theme, x + 136, rowY - 10, {
+          size: 24,
+          minSize: 15,
+          color: c.white,
+          align: "left",
+          maxWidth: 410
+        });
+        drawOddbarText(store, x + 138, rowY + 20, {
+          size: 14,
+          minSize: 10,
+          color: c.cyan,
+          align: "left",
+          maxWidth: 390
+        });
+        drawOddbarText(price, x + w - 70, rowY + 2, {
+          size: 18,
+          minSize: 11,
+          color: c.lime,
+          align: "right",
+          maxWidth: 154
+        });
+      });
+
+      if (entries.length > visible.length) {
+        drawOddbarText(`외 ${entries.length - visible.length}개 더`, x + w / 2, y + h - 34, {
+          size: 24,
+          minSize: 18,
+          color: c.pink,
+          maxWidth: 260
+        });
+      }
+    }
+
+    function drawOddbarFooter() {
+      const c = oddbar;
+      drawOddbarText("나랑 갇히러 갈사람", 540, 1242, {
+        size: 42,
+        minSize: 28,
+        color: c.white,
+        maxWidth: 640
+      });
+      neonRoughLine(350, 1280, 730, 1262, c.amber, 4, 2.4, 16);
+    }
+
+    function drawOddbarPoster() {
+      drawOddbarBackground();
+      drawOddbarEntries(displayEntries());
+      drawOddbarFooter();
+      drawNoise(.028);
+    }
+
+    function drawAllboxText(text, x, y, options = {}) {
+      const {
+        size = 44,
+        minSize = 24,
+        color = allbox.white,
+        align = "center",
+        baseline = "middle",
+        maxWidth = null,
+        shadow = true
+      } = options;
+      const fittedSize = maxWidth ? fitSize(text, maxWidth, size, minSize, 400, allboxFont) : size;
+      ctx.save();
+      ctx.font = `400 ${fittedSize}px ${allboxFont}`;
+      ctx.textAlign = align;
+      ctx.textBaseline = baseline;
+      if (shadow) {
+        ctx.fillStyle = "rgba(5, 13, 16, .72)";
+        ctx.fillText(text, x + 4, y + 5);
+      }
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y);
+      ctx.restore();
+      return fittedSize;
+    }
+
+    function drawAllboxWrappedText(text, x, y, maxWidth, baseSize, minSize, lineGap, color) {
+      let size = baseSize;
+      let lines = wrapLines(text, maxWidth, size, 400, allboxFont);
+      while ((lines.length > 2 || lines.some((line) => {
+        ctx.font = `400 ${size}px ${allboxFont}`;
+        return ctx.measureText(line).width > maxWidth;
+      })) && size > minSize) {
+        size -= 2;
+        lines = wrapLines(text, maxWidth, size, 400, allboxFont);
+      }
+      const total = (lines.length - 1) * (size + lineGap);
+      lines.forEach((line, index) => {
+        drawAllboxText(line, x, y - total / 2 + index * (size + lineGap), {
+          size,
+          minSize,
+          color,
+          maxWidth
+        });
+      });
+    }
+
+    function drawAllboxWallTexture() {
+      const c = allbox;
+      const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bg.addColorStop(0, c.blueLight);
+      bg.addColorStop(.38, "#035f85");
+      bg.addColorStop(.72, "#034766");
+      bg.addColorStop(1, c.blueDeep);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.globalAlpha = .31;
+      ctx.strokeStyle = c.blueDark;
+      ctx.lineWidth = 2;
+      for (let y = 24; y < canvas.height; y += 38) {
+        roughLine(0, y, canvas.width, y + Math.sin(y * .018) * 4, c.blueDark, 1.6, 1.1);
+      }
+      ctx.globalAlpha = .24;
+      for (let y = 44; y < canvas.height; y += 76) {
+        const offset = Math.floor(y / 76) % 2 ? 66 : 12;
+        for (let x = offset; x < canvas.width; x += 132) {
+          roughLine(x, y - 18, x + Math.sin(x * .03) * 3, y + 18, c.blueDark, 1.2, .9);
+        }
+      }
+      ctx.restore();
+
+      ctx.save();
+      for (let i = 0; i < 1800; i += 1) {
+        const x = (i * 67) % canvas.width;
+        const y = (i * 149) % canvas.height;
+        const alpha = .052 + ((i * 17) % 50) / 1150;
+        ctx.fillStyle = i % 3 ? `rgba(0, 16, 28, ${alpha})` : `rgba(231, 222, 168, ${alpha * .42})`;
+        ctx.fillRect(x, y, 1 + (i % 3), 1);
+      }
+      ctx.restore();
+
+      const vignette = ctx.createRadialGradient(540, 620, 260, 540, 670, 820);
+      vignette.addColorStop(0, "rgba(255,255,255,0)");
+      vignette.addColorStop(1, "rgba(0,0,0,.42)");
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawAllboxFrame(x, y, w, h, accent = allbox.yellow) {
+      const c = allbox;
+      ctx.save();
+      ctx.fillStyle = "rgba(0, 0, 0, .28)";
+      ctx.fillRect(x + 12, y + 14, w, h);
+      ctx.fillStyle = c.charcoal;
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = c.black;
+      ctx.lineWidth = 8;
+      ctx.strokeRect(x, y, w, h);
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x + 12, y + 12, w - 24, h - 24);
+      ctx.fillStyle = "rgba(255, 255, 255, .04)";
+      ctx.fillRect(x + 18, y + 18, w - 36, h - 36);
+      ctx.restore();
+    }
+
+    function drawAllboxShutter(x, y, w, h) {
+      const c = allbox;
+      ctx.save();
+      ctx.fillStyle = "#2e3a3f";
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = "rgba(8, 12, 14, .72)";
+      ctx.lineWidth = 2;
+      for (let lineY = y + 16; lineY < y + h - 10; lineY += 18) {
+        ctx.beginPath();
+        ctx.moveTo(x + 10, lineY);
+        ctx.lineTo(x + w - 10, lineY);
+        ctx.stroke();
+      }
+      hatchRect(x, y, w, h, 16, c.white, .035, -.35, 1);
+      ctx.restore();
+    }
+
+    function drawAllboxRoomPanel(entry, index, x, y, w, h) {
+      const c = allbox;
+      const theme = entry.theme || "테마명";
+      const store = entry.store || "매장명";
+      const price = entry.price || "가격";
+      const accent = index % 2 ? c.yellow : c.charcoal;
+      const large = w > 620;
+
+      drawAllboxFrame(x, y, w, h, index % 2 ? c.yellow : c.blueLight);
+      drawAllboxShutter(x + 22, y + 24, w - 44, h - 48);
+
+      ctx.save();
+      ctx.globalAlpha = entry.placeholder ? .66 : 1;
+      ctx.fillStyle = "rgba(4, 9, 11, .66)";
+      ctx.fillRect(x + 34, y + 44, w - 68, h - 88);
+      ctx.strokeStyle = rgba(index % 2 ? c.yellow : c.blueLight, .72);
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x + 34, y + 44, w - 68, h - 88);
+      ctx.restore();
+
+      drawAllboxText(`0${index + 1}`, x + 58, y + 60, {
+        size: large ? 34 : 27,
+        minSize: 18,
+        color: c.yellow,
+        align: "left",
+        baseline: "middle",
+        shadow: false
+      });
+      drawAllboxText(theme, x + w / 2, y + h / 2 - 20, {
+        size: large ? 58 : 40,
+        minSize: large ? 30 : 23,
+        color: c.white,
+        maxWidth: w - 140
+      });
+      drawAllboxText(store, x + w / 2, y + h / 2 + (large ? 42 : 28), {
+        size: large ? 30 : 22,
+        minSize: 15,
+        color: c.yellow,
+        maxWidth: w - 150,
+        shadow: false
+      });
+      drawAllboxText(price, x + w - 56, y + h - 52, {
+        size: large ? 34 : 26,
+        minSize: 17,
+        color: accent === c.yellow ? c.yellow : c.white,
+        align: "right",
+        maxWidth: large ? 230 : 170
+      });
+    }
+
+    function drawAllboxTitle() {
+      const c = allbox;
+      drawAllboxWrappedText(displayTitle(), 540, 178, 920, 92, 48, 8, c.yellow);
+      roughLine(220, 310, 860, 310, c.yellowDark, 4, 1.5);
+    }
+
+    function drawAllboxEntries(entries) {
+      const visible = entries.slice(0, 4);
+      const positions = visible.length <= 1
+        ? [[116, 558, 848, 292]]
+        : visible.length <= 2
+          ? [[116, 456, 848, 266], [116, 764, 848, 266]]
+          : [
+            [72, 462, 444, 246],
+            [564, 462, 444, 246],
+            [72, 754, 444, 246],
+            [564, 754, 444, 246]
+          ];
+      visible.forEach((entry, index) => {
+        drawAllboxRoomPanel(entry, index, ...positions[index]);
+      });
+
+      if (entries.length > visible.length) {
+        drawAllboxText(`외 ${entries.length - visible.length}개 더`, 540, 1088, {
+          size: 24,
+          minSize: 18,
+          color: allbox.cream,
+          maxWidth: 260,
+          shadow: false
+        });
+      }
+    }
+
+    function drawAllboxFooter() {
+      const c = allbox;
+      drawAllboxText("나랑 갇히러 갈사람", 540, 1235, {
+        size: 38,
+        minSize: 26,
+        color: c.yellow,
+        maxWidth: 640
+      });
+    }
+
+    function drawAllboxPoster() {
+      drawAllboxWallTexture();
+      drawAllboxTitle();
+      drawAllboxEntries(displayEntries());
+      drawAllboxFooter();
+    }
+
+    function ensureOddbarFontLoaded() {
+      if (!document.fonts || oddbarFontLoaded || oddbarFontLoading) return;
+      oddbarFontLoading = true;
+      document.fonts.load(oddbarFontLoadSpec, "오늘 밤 오드바 나랑 갇히러 갈사람").then((loadedFaces) => {
+        oddbarFontLoaded = loadedFaces.length > 0;
+        oddbarFontLoading = false;
+        if (activeStyle === "oddbar") renderInvite();
+      }).catch(() => {
+        oddbarFontLoading = false;
+      });
+    }
+
+    function ensureAllboxFontLoaded() {
+      if (!document.fonts || allboxFontLoaded || allboxFontLoading) return;
+      allboxFontLoading = true;
+      document.fonts.load(allboxFontLoadSpec, "올더박스파라다이스 나랑 갇히러 갈사람").then((loadedFaces) => {
+        allboxFontLoaded = loadedFaces.length > 0;
+        allboxFontLoading = false;
+        if (activeStyle === "allbox") renderInvite();
+      }).catch(() => {
+        allboxFontLoading = false;
+      });
+    }
+
     function renderInvite() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (activeStyle === "napolitan") {
         drawNapolitanPoster();
       } else if (activeStyle === "memory") {
         drawMemoryPoster();
+      } else if (activeStyle === "oddbar") {
+        ensureOddbarFontLoaded();
+        drawOddbarPoster();
+      } else if (activeStyle === "allbox") {
+        ensureAllboxFontLoaded();
+        drawAllboxPoster();
       } else {
         drawShortlinePoster();
       }
