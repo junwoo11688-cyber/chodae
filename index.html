@@ -61,6 +61,22 @@
       font-display: swap;
     }
 
+    @font-face {
+      font-family: "Binggrae2";
+      src: url("./fonts/Binggrae2.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Binggrae2 Bold";
+      src: url("./fonts/Binggrae2-Bold.ttf") format("truetype");
+      font-weight: 700 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       color-scheme: light;
       --bg: #f6f6f2;
@@ -346,6 +362,12 @@
         linear-gradient(90deg, #075f78 0 42%, #d5b33d 42% 58%, #1a2529 58% 78%, #0a6f8f 78%);
     }
 
+    .style-swatch.dearfriend {
+      background:
+        linear-gradient(90deg, #171714 0 6%, transparent 6% 94%, #171714 94%),
+        repeating-linear-gradient(90deg, #21b9af 0 13px, #e4c66b 13px 19px, #ef5960 19px 23px, #6ad4ce 23px 43px);
+    }
+
     .style-note {
       margin-left: auto;
       color: rgba(32, 32, 29, .54);
@@ -611,6 +633,11 @@
             올더박스파라다이스
             <span class="style-note">blue wall</span>
           </button>
+          <button class="style-option" type="button" data-style="dearfriend" aria-pressed="false">
+            <span class="style-swatch dearfriend" aria-hidden="true"></span>
+            디어마이프렌드
+            <span class="style-note">letter pop</span>
+          </button>
         </div>
       </div>
 
@@ -681,6 +708,8 @@
     let oddbarFontLoading = false;
     let allboxFontLoaded = false;
     let allboxFontLoading = false;
+    let dearfriendFontLoaded = false;
+    let dearfriendFontLoading = false;
     const roomDisplayLimit = 10;
 
     const palette = {
@@ -846,6 +875,10 @@
     const oddbarFontLoadSpec = '400 72px "Griun Gyuwon"';
     const allboxFont = '"Cafe24 Ohsquare Air", "Pretendard Bold", "Pretendard", "Malgun Gothic", sans-serif';
     const allboxFontLoadSpec = '400 72px "Cafe24 Ohsquare Air"';
+    const dearfriendTitleFont = '"Binggrae2 Bold", "Binggrae2", "Malgun Gothic", sans-serif';
+    const dearfriendBodyFont = '"Binggrae2", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif';
+    const dearfriendTitleLoadSpec = '700 72px "Binggrae2 Bold"';
+    const dearfriendBodyLoadSpec = '400 40px "Binggrae2"';
 
     function drawText(text, x, y, options = {}) {
       const {
@@ -1012,6 +1045,23 @@
       metalDark: "#12191c",
       rust: "#8a4a23",
       black: "#090d0f"
+    };
+
+    const dearfriend = {
+      teal: "#27beb5",
+      tealLight: "#77d8d0",
+      mint: "#a5eadf",
+      yellow: "#ead16f",
+      red: "#ef4e54",
+      redDark: "#9a1132",
+      coral: "#ff7661",
+      pink: "#f36373",
+      cream: "#fff1c8",
+      paper: "#fffbe1",
+      ink: "#4a2530",
+      brown: "#93613d",
+      shadow: "#143833",
+      black: "#161616"
     };
 
     function roughLine(x1, y1, x2, y2, color, width = 2, jitter = 1.4) {
@@ -2250,6 +2300,343 @@
       drawAllboxFooter();
     }
 
+    function drawDearfriendText(text, x, y, options = {}) {
+      const {
+        size = 44,
+        minSize = 24,
+        color = dearfriend.ink,
+        align = "center",
+        baseline = "middle",
+        maxWidth = null,
+        family = dearfriendBodyFont,
+        weight = 400,
+        strokeColor = null,
+        strokeWidth = 0,
+        shadowColor = null,
+        shadowOffset = 0
+      } = options;
+      const fittedSize = maxWidth ? fitSize(text, maxWidth, size, minSize, weight, family) : size;
+      ctx.save();
+      ctx.font = `${weight} ${fittedSize}px ${family}`;
+      ctx.textAlign = align;
+      ctx.textBaseline = baseline;
+      if (shadowColor && shadowOffset) {
+        ctx.fillStyle = shadowColor;
+        ctx.fillText(text, x + shadowOffset, y + shadowOffset);
+      }
+      if (strokeColor && strokeWidth) {
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.strokeText(text, x, y);
+      }
+      ctx.fillStyle = color;
+      ctx.fillText(text, x, y);
+      ctx.restore();
+      return fittedSize;
+    }
+
+    function drawDearfriendWrappedTitle(text, x, y, maxWidth) {
+      let size = 74;
+      let lines = wrapLines(text, maxWidth, size, 900, dearfriendTitleFont);
+      while ((lines.length > 2 || lines.some((line) => {
+        ctx.font = `900 ${size}px ${dearfriendTitleFont}`;
+        return ctx.measureText(line).width > maxWidth;
+      })) && size > 38) {
+        size -= 2;
+        lines = wrapLines(text, maxWidth, size, 900, dearfriendTitleFont);
+      }
+      const total = (lines.length - 1) * (size + 4);
+      lines.forEach((line, index) => {
+        drawDearfriendText(line, x, y - total / 2 + index * (size + 4), {
+          size,
+          minSize: 38,
+          color: dearfriend.pink,
+          family: dearfriendTitleFont,
+          weight: 900,
+          maxWidth,
+          strokeColor: dearfriend.redDark,
+          strokeWidth: Math.max(3, size * .08),
+          shadowColor: "rgba(74, 37, 48, .35)",
+          shadowOffset: 5
+        });
+      });
+    }
+
+    function drawDearfriendBackground() {
+      const c = dearfriend;
+      ctx.fillStyle = c.teal;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const stripes = [
+        [0, c.teal],
+        [34, c.tealLight],
+        [72, c.yellow],
+        [92, c.red],
+        [102, c.mint],
+        [156, c.teal],
+        [208, c.tealLight],
+        [244, c.yellow],
+        [266, c.red],
+        [278, c.mint]
+      ];
+      for (let x = -20; x < canvas.width + 280; x += 300) {
+        stripes.forEach(([offset, color]) => {
+          const width = color === c.yellow ? 18 : color === c.red ? 8 : 34;
+          ctx.fillStyle = color;
+          ctx.fillRect(x + offset, 0, width, canvas.height);
+          ctx.fillStyle = "rgba(22, 22, 22, .18)";
+          ctx.fillRect(x + offset + width - 2, 0, 2, canvas.height);
+        });
+      }
+
+      ctx.save();
+      ctx.globalAlpha = .13;
+      for (let i = 0; i < 2200; i += 1) {
+        const x = (i * 71) % canvas.width;
+        const y = (i * 137) % canvas.height;
+        ctx.fillStyle = i % 2 ? "#184843" : "#fff1c8";
+        ctx.fillRect(x, y, 1 + (i % 2), 1);
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = c.black;
+      ctx.lineWidth = 14;
+      ctx.strokeRect(16, 16, canvas.width - 32, canvas.height - 32);
+      ctx.strokeStyle = c.redDark;
+      ctx.lineWidth = 8;
+      ctx.strokeRect(28, 28, canvas.width - 56, canvas.height - 56);
+      ctx.strokeStyle = c.cream;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(44, 44, canvas.width - 88, canvas.height - 88);
+      ctx.restore();
+    }
+
+    function drawEnvelope(x, y, w, h, angle = 0, label = "") {
+      const c = dearfriend;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.fillStyle = c.paper;
+      ctx.strokeStyle = "rgba(74, 37, 48, .58)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.rect(-w / 2, -h / 2, w, h);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-w / 2, -h / 2);
+      ctx.lineTo(0, 5);
+      ctx.lineTo(w / 2, -h / 2);
+      ctx.moveTo(-w / 2, h / 2);
+      ctx.lineTo(-2, 0);
+      ctx.lineTo(w / 2, h / 2);
+      ctx.stroke();
+      if (label) {
+        drawDearfriendText(label, 0, 2, {
+          size: 11,
+          minSize: 8,
+          color: c.brown,
+          maxWidth: w - 12,
+          family: dearfriendBodyFont,
+          shadowOffset: 0
+        });
+      }
+      ctx.restore();
+    }
+
+    function drawDearfriendMailbox() {
+      const c = dearfriend;
+      ctx.save();
+      ctx.translate(172, 988);
+      ctx.fillStyle = "rgba(20, 56, 51, .35)";
+      ctx.beginPath();
+      ctx.ellipse(98, 210, 150, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = c.redDark;
+      fillRoundRect(20, 54, 210, 244, 18);
+      ctx.fillStyle = c.red;
+      fillRoundRect(52, 24, 216, 264, 24);
+      ctx.fillStyle = c.coral;
+      ctx.beginPath();
+      ctx.moveTo(52, 68);
+      ctx.quadraticCurveTo(86, 0, 172, 24);
+      ctx.quadraticCurveTo(260, 48, 268, 120);
+      ctx.lineTo(268, 288);
+      ctx.lineTo(52, 288);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = c.redDark;
+      ctx.lineWidth = 8;
+      ctx.stroke();
+
+      ctx.fillStyle = c.red;
+      fillRoundRect(96, 166, 118, 74, 6);
+      ctx.strokeStyle = c.redDark;
+      ctx.lineWidth = 5;
+      strokeRoundRect(96, 166, 118, 74, 6);
+      ctx.fillStyle = c.redDark;
+      fillRoundRect(98, 122, 116, 24, 5);
+      ctx.fillStyle = c.cream;
+      ctx.beginPath();
+      ctx.arc(126, 100, 22, 0, Math.PI * 2);
+      ctx.arc(188, 100, 22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = c.black;
+      ctx.beginPath();
+      ctx.arc(135, 94, 12, 0, Math.PI * 2);
+      ctx.arc(197, 94, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = c.paper;
+      ctx.beginPath();
+      ctx.arc(140, 88, 6, 0, Math.PI * 2);
+      ctx.arc(202, 88, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = c.redDark;
+      ctx.beginPath();
+      ctx.ellipse(162, 130, 42, 28, 0, 0, Math.PI);
+      ctx.fill();
+      drawEnvelope(160, 135, 78, 42, -.08);
+      drawEnvelope(234, 210, 84, 48, .28);
+      drawEnvelope(292, 274, 96, 54, -.2, "초대장");
+      drawEnvelope(76, 310, 90, 48, -.05);
+      drawEnvelope(226, 330, 82, 44, .12);
+      ctx.restore();
+    }
+
+    function drawDearfriendEntries(entries) {
+      const c = dearfriend;
+      const x = 227;
+      const y = 438;
+      const w = 626;
+      const h = 622;
+      const visible = entries.slice(0, roomDisplayLimit);
+
+      ctx.save();
+      ctx.fillStyle = "rgba(255, 251, 225, .94)";
+      fillRoundRect(x, y, w, h, 14);
+      ctx.strokeStyle = c.redDark;
+      ctx.lineWidth = 6;
+      strokeRoundRect(x, y, w, h, 14);
+      ctx.strokeStyle = c.coral;
+      ctx.lineWidth = 3;
+      strokeRoundRect(x + 14, y + 14, w - 28, h - 28, 10);
+      hatchRect(x + 22, y + 22, w - 44, h - 44, 18, c.teal, .05, -.5, 1);
+
+      drawDearfriendText("LETTER LIST", x + w / 2, y + 48, {
+        size: 28,
+        minSize: 20,
+        color: c.red,
+        family: dearfriendTitleFont,
+        weight: 900,
+        strokeColor: c.redDark,
+        strokeWidth: 2,
+        maxWidth: 260,
+        shadowOffset: 0
+      });
+      roughLine(x + 58, y + 82, x + w - 58, y + 82, c.redDark, 2, .8);
+
+      const rowH = 48;
+      visible.forEach((entry, index) => {
+        const rowY = y + 122 + index * rowH;
+        const theme = entry.theme || "테마명";
+        const store = entry.store || "매장명";
+        const price = entry.price || "가격";
+
+        ctx.fillStyle = index % 2 ? "rgba(39, 190, 181, .16)" : "rgba(239, 78, 84, .1)";
+        fillRoundRect(x + 34, rowY - 22, w - 68, 40, 8);
+        drawDearfriendText(String(index + 1).padStart(2, "0"), x + 70, rowY, {
+          size: 16,
+          minSize: 12,
+          color: c.redDark,
+          align: "left",
+          family: dearfriendBodyFont,
+          maxWidth: 34,
+          shadowOffset: 0
+        });
+        drawDearfriendText(theme, x + 112, rowY - 8, {
+          size: 23,
+          minSize: 14,
+          color: c.ink,
+          align: "left",
+          family: dearfriendTitleFont,
+          weight: 900,
+          maxWidth: 330,
+          shadowOffset: 0
+        });
+        drawDearfriendText(store, x + 114, rowY + 15, {
+          size: 13,
+          minSize: 9,
+          color: c.brown,
+          align: "left",
+          family: dearfriendBodyFont,
+          maxWidth: 330,
+          shadowOffset: 0
+        });
+        drawDearfriendText(price, x + w - 42, rowY + 2, {
+          size: 17,
+          minSize: 10,
+          color: c.redDark,
+          align: "right",
+          family: dearfriendBodyFont,
+          maxWidth: 106,
+          shadowOffset: 0
+        });
+      });
+
+      if (entries.length > visible.length) {
+        drawDearfriendText(`외 ${entries.length - visible.length}개 더`, x + w / 2, y + h - 26, {
+          size: 17,
+          minSize: 12,
+          color: c.redDark,
+          family: dearfriendBodyFont,
+          maxWidth: 240,
+          shadowOffset: 0
+        });
+      }
+      ctx.restore();
+    }
+
+    function drawDearfriendPoster() {
+      const c = dearfriend;
+      drawDearfriendBackground();
+      drawDearfriendText("SINCE 2026", 540, 86, {
+        size: 18,
+        minSize: 14,
+        color: c.redDark,
+        family: dearfriendBodyFont,
+        maxWidth: 220,
+        shadowOffset: 0
+      });
+      drawDearfriendWrappedTitle(displayTitle(), 540, 190, 820);
+      drawDearfriendText("ESCAPE ROOM INVITATION", 540, 298, {
+        size: 24,
+        minSize: 16,
+        color: c.redDark,
+        family: dearfriendBodyFont,
+        maxWidth: 520,
+        shadowColor: c.cream,
+        shadowOffset: 2
+      });
+      drawDearfriendEntries(displayEntries());
+      drawDearfriendText("나랑 갇히러 갈사람", 540, 1192, {
+        size: 34,
+        minSize: 22,
+        color: c.red,
+        family: dearfriendTitleFont,
+        weight: 900,
+        maxWidth: 640,
+        strokeColor: c.redDark,
+        strokeWidth: 2,
+        shadowColor: c.cream,
+        shadowOffset: 3
+      });
+      drawNoise(.018);
+    }
+
     function ensureOddbarFontLoaded() {
       if (!document.fonts || oddbarFontLoaded || oddbarFontLoading) return;
       oddbarFontLoading = true;
@@ -2274,6 +2661,21 @@
       });
     }
 
+    function ensureDearfriendFontsLoaded() {
+      if (!document.fonts || dearfriendFontLoaded || dearfriendFontLoading) return;
+      dearfriendFontLoading = true;
+      Promise.all([
+        document.fonts.load(dearfriendTitleLoadSpec, "디어마이프렌드 초대장"),
+        document.fonts.load(dearfriendBodyLoadSpec, "나랑 갇히러 갈사람")
+      ]).then((results) => {
+        dearfriendFontLoaded = results.every((faces) => faces.length > 0);
+        dearfriendFontLoading = false;
+        if (activeStyle === "dearfriend") renderInvite();
+      }).catch(() => {
+        dearfriendFontLoading = false;
+      });
+    }
+
     function renderInvite() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (activeStyle === "napolitan") {
@@ -2286,6 +2688,9 @@
       } else if (activeStyle === "allbox") {
         ensureAllboxFontLoaded();
         drawAllboxPoster();
+      } else if (activeStyle === "dearfriend") {
+        ensureDearfriendFontsLoaded();
+        drawDearfriendPoster();
       } else {
         drawShortlinePoster();
       }
